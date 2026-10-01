@@ -303,6 +303,25 @@ class MockableTests: XCTestCase {
             }
         }
     }
+
+    func testReplacingResultReleasesPreviousClosureAfterUnlocking() {
+        final class CallsMockOnDeinit {
+            let mock: TestClass
+            init(mock: TestClass) { self.mock = mock }
+            deinit { mock.functionWithVoidResult(arg1: "deinit", arg2: 0) }
+        }
+        let ref = mock.functionWithIntResultRef
+        mock.registerResult(for: ref) { [object = CallsMockOnDeinit(mock: mock)] _, _ in
+            _ = object
+            return 1
+        }
+
+        mock.registerResult(for: ref) { _, _ in 2 }
+
+        XCTAssertEqual(mock.functionWithIntResult(arg1: "abc", arg2: 123), 2)
+        XCTAssertTrue(mock.hasCalled(\.functionWithVoidResultRef))
+    }
+
 }
 
 private final class TestClass: TestProtocol, Mockable, @unchecked Sendable {

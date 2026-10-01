@@ -19,8 +19,8 @@ public extension Mockable {
         for ref: MockReference<Arguments, Result>,
         result: @escaping (Arguments) throws -> Result
     ) {
-        mock.registeredCallsLock.withLock {
-            mock.registeredResults[ref.id] = result
+        updateRegistrations {
+            mock.registeredResults.updateValue(result, forKey: ref.id)
         }
     }
 
@@ -45,8 +45,8 @@ public extension Mockable {
         for ref: AsyncMockReference<Arguments, Result>,
         result: @escaping (Arguments) async throws -> Result
     ) {
-        mock.registeredCallsLock.withLock {
-            mock.registeredResults[ref.id] = result
+        updateRegistrations {
+            mock.registeredResults.updateValue(result, forKey: ref.id)
         }
     }
 
@@ -71,8 +71,8 @@ public extension Mockable {
         for ref: ThrowingMockReference<Arguments, Result>,
         result: @escaping (Arguments) throws -> Result
     ) {
-        mock.registeredCallsLock.withLock {
-            mock.registeredResults[ref.id] = result
+        updateRegistrations {
+            mock.registeredResults.updateValue(result, forKey: ref.id)
         }
     }
 
@@ -97,8 +97,8 @@ public extension Mockable {
         for ref: AsyncThrowingMockReference<Arguments, Result>,
         result: @escaping (Arguments) async throws -> Result
     ) {
-        mock.registeredCallsLock.withLock {
-            mock.registeredResults[ref.id] = result
+        updateRegistrations {
+            mock.registeredResults.updateValue(result, forKey: ref.id)
         }
     }
 
@@ -123,11 +123,11 @@ public extension Mockable {
         for ref: ThrowingMockReference<Arguments, Result>,
         error: Error
     ) {
-        mock.registeredCallsLock.withLock {
-            mock.registeredResults[ref.id] = { (_: Arguments) throws -> Result in
-                throw error
-            }
+        updateRegistrations {
             mock.registeredErrors[ref.id] = error
+            return mock.registeredResults.updateValue({ (_: Arguments) throws -> Result in
+                throw error
+            }, forKey: ref.id)
         }
     }
 
@@ -152,11 +152,11 @@ public extension Mockable {
         for ref: AsyncThrowingMockReference<Arguments, Result>,
         error: Error
     ) {
-        mock.registeredCallsLock.withLock {
-            mock.registeredResults[ref.id] = { (_: Arguments) async throws -> Result in
-                throw error
-            }
+        updateRegistrations {
             mock.registeredErrors[ref.id] = error
+            return mock.registeredResults.updateValue({ (_: Arguments) async throws -> Result in
+                throw error
+            }, forKey: ref.id)
         }
     }
 

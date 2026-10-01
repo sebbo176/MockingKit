@@ -33,6 +33,14 @@ public protocol Mockable: Sendable {
 
 extension Mockable {
 
+    /// Mutates the registrations under the lock and releases whatever `body` displaces only
+    /// after the lock is given back. A displaced closure may capture an object whose `deinit`
+    /// calls this mock, which would deadlock on the non-recursive lock if released inside.
+    func updateRegistrations<Displaced>(_ body: () -> Displaced) {
+        let displaced = mock.registeredCallsLock.withLock(body)
+        withExtendedLifetime(displaced) {}
+    }
+
     func registerCall<Arguments, Result>(
         _ call: MockCall<Arguments, Result>,
         for ref: MockReference<Arguments, Result>
