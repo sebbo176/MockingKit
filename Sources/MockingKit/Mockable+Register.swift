@@ -19,7 +19,9 @@ public extension Mockable {
         for ref: MockReference<Arguments, Result>,
         result: @escaping (Arguments) throws -> Result
     ) {
-        mock.registeredResults[ref.id] = result
+        mock.registeredCallsLock.withLock {
+            mock.registeredResults[ref.id] = result
+        }
     }
 
     /// Register a result value for a mock reference.
@@ -43,7 +45,9 @@ public extension Mockable {
         for ref: AsyncMockReference<Arguments, Result>,
         result: @escaping (Arguments) async throws -> Result
     ) {
-        mock.registeredResults[ref.id] = result
+        mock.registeredCallsLock.withLock {
+            mock.registeredResults[ref.id] = result
+        }
     }
 
     /// Register a result value for an async mock reference.
@@ -67,7 +71,9 @@ public extension Mockable {
         for ref: ThrowingMockReference<Arguments, Result>,
         result: @escaping (Arguments) throws -> Result
     ) {
-        mock.registeredResults[ref.id] = result
+        mock.registeredCallsLock.withLock {
+            mock.registeredResults[ref.id] = result
+        }
     }
 
     /// Register a result value for a throwing mock reference.
@@ -91,7 +97,9 @@ public extension Mockable {
         for ref: AsyncThrowingMockReference<Arguments, Result>,
         result: @escaping (Arguments) async throws -> Result
     ) {
-        mock.registeredResults[ref.id] = result
+        mock.registeredCallsLock.withLock {
+            mock.registeredResults[ref.id] = result
+        }
     }
 
     /// Register a result value for an async throwing mock reference.
